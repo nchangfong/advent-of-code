@@ -24,6 +24,8 @@ func readInput() []string {
 		log.Fatal(err)
 	}
 
+	defer file.Close()
+
 	var res []string
 
 	scanner := bufio.NewScanner(file)
