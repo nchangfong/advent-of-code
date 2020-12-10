@@ -35,8 +35,8 @@ func (l *lookup) getIndex(s string) int {
 	return l.data[s]
 }
 
-func readInput() int {
-	file, err := os.Open(path.Join("testdata", "input"))
+func readInput(filename string) ([][]int, lookup) {
+	file, err := os.Open(path.Join("testdata", filename))
 
 	if err != nil {
 		log.Fatal(err)
@@ -88,10 +88,12 @@ func readInput() int {
 		}
 	}
 
-	count := 0
+	return a, *lookupTable
+}
 
-	startCol := lookupTable.getIndex("shiny gold")
-	q := []int{startCol}
+func part1(c int, a [][]int) int {
+	sum := 0
+	q := []int{c}
 	visited := make(map[int]bool)
 	for len(q) != 0 {
 		col := q[0]
@@ -99,19 +101,34 @@ func readInput() int {
 			if a[k][col] != 0 && !visited[k] {
 				q = append(q, k)
 				visited[k] = true
-				count++
+				sum++
 			}
 		}
 		// "dequeue" first element
 		q = q[1:]
 	}
 
-	return count
+	return sum
 }
 
-func run() []int {
-	part1 := 0
-	part2 := 0
+func part2(c int, a [][]int) int {
+	sum := 1
+	for i := 0; i < len(a[c][:]); i++ {
+		curr := a[c][i]
+		if curr != 0 {
+			sum += curr * part2(i, a)
+		}
+	}
 
-	return []int{part1, part2}
+	return sum
+}
+
+func run(filename string) (int, int) {
+	a, dict := readInput(filename)
+	start := dict.getIndex("shiny gold")
+
+	p1 := part1(start, a)
+	p2 := part2(start, a) - 1
+
+	return p1, p2
 }
