@@ -68,8 +68,45 @@ func part1(size int, in []int) int {
 	return 0
 }
 
-func run(size int, filename string) (int, int) {
+func minMax(in []int) (int, int) {
+	var min, max int
 
-	p1 := part1(size, readInput(filename))
-	return p1, 0
+	for i, v := range in {
+		switch {
+		case v < min || i == 0:
+			min = v
+		case v > max:
+			max = v
+		}
+	}
+	return min, max
+}
+
+func part2(target int, in []int) int {
+	l := 0
+	r := 0
+	res := 0
+
+	for l < len(in) && r < len(in) {
+		switch {
+		case res > target:
+			res -= in[l]
+			l++
+		case res < target:
+			res += in[r]
+			r++
+		case res == target:
+			min, max := minMax(in[l:r])
+			return min + max
+		}
+	}
+
+	return 0
+}
+
+func run(size int, filename string) (int, int) {
+	in := readInput(filename)
+	p1 := part1(size, in)
+	p2 := part2(p1, in)
+	return p1, p2
 }
