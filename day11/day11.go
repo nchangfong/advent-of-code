@@ -110,3 +110,72 @@ func part1(a [][]string) int {
 
 	return count("#", a)
 }
+
+func updateP2(i int, j int, a [][]string) string {
+	res := a[i][j]
+	if res == floor {
+		return floor
+	}
+
+	xMin := maxInt(j-1, 0)
+	xMax := minInt(j+1, len(a[i])-1)
+	yMin := maxInt(i-1, 0)
+	yMax := minInt(i+1, len(a)-1)
+	adj := 0
+
+	for row := yMin; row <= yMax; row++ {
+		for col := xMin; col <= xMax; col++ {
+			if row == i && col == j {
+				continue
+			}
+
+			curr := a[row][col]
+			if curr == emptySeat {
+				continue
+			}
+			if curr == floor {
+				dy := row - i
+				dx := col - j
+				for r, c := row, col; r >= 0 && r < len(a) && c >= 0 && c < len(a[i]) && curr == floor; r, c = r+dy, c+dx {
+					curr = a[r][c]
+				}
+			}
+
+			if curr == occupiedSeat {
+				adj++
+			}
+
+		}
+	}
+
+	if res == emptySeat && adj == 0 {
+		res = occupiedSeat
+	} else if res == occupiedSeat && adj >= 5 {
+		res = emptySeat
+	}
+	return res
+}
+
+func part2(a [][]string) int {
+	m := len(a)
+	n := len(a[0])
+	b := [][]string{}
+	changed := false
+	b = make([][]string, m)
+	for i := 0; i < m; i++ {
+		b[i] = make([]string, n)
+		for j := 0; j < n; j++ {
+			b[i][j] = updateP2(i, j, a)
+
+			if !changed && b[i][j] != a[i][j] {
+				changed = true // if one is updated, need to continue
+			}
+		}
+	}
+
+	if changed {
+		return (part2(b))
+	}
+
+	return count("#", a)
+}
